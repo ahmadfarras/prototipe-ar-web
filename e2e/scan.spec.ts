@@ -26,22 +26,22 @@ async function showQrToCamera(page: Page, text: string) {
 test('explains a blocked camera and links back to the products', async ({
   page,
 }) => {
-  await page.goto('/scan')
+  await page.goto('/view-in-ar/scan')
 
   await expect(page.getByRole('alert')).toContainText(
     'Camera access was blocked',
   )
   await page.getByRole('link', { name: 'Browse products instead' }).click()
-  await expect(page).toHaveURL('/')
+  await expect(page).toHaveURL('/view-in-ar')
 })
 
 test('scanning a product QR code opens that product', async ({ page }) => {
   const errors = collectErrors(page)
-  await showQrToCamera(page, 'https://ar.example.com/p/sheen-chair')
+  await showQrToCamera(page, 'https://ar.example.com/view-in-ar/p/sheen-chair')
 
-  await page.goto('/scan')
+  await page.goto('/view-in-ar/scan')
 
-  await expect(page).toHaveURL('/p/sheen-chair')
+  await expect(page).toHaveURL('/view-in-ar/p/sheen-chair')
   await expect(
     page.getByRole('heading', { level: 1, name: 'Sheen Chair' }),
   ).toBeVisible()
@@ -53,17 +53,17 @@ test('a QR code for another site keeps the user on the scanner', async ({
 }) => {
   await showQrToCamera(page, 'https://evil.example/login')
 
-  await page.goto('/scan')
+  await page.goto('/view-in-ar/scan')
 
   await expect(page.getByRole('status')).toContainText(
     'That QR code is not a product code',
   )
-  await expect(page).toHaveURL('/scan')
+  await expect(page).toHaveURL('/view-in-ar/scan')
 })
 
 test('releases the camera when leaving the scanner', async ({ page }) => {
   await showQrToCamera(page, 'not a product code')
-  await page.goto('/scan')
+  await page.goto('/view-in-ar/scan')
   const video = page.getByLabel('Camera preview')
   await expect
     .poll(() => video.evaluate((el: HTMLVideoElement) => el.srcObject !== null))
@@ -74,7 +74,7 @@ test('releases the camera when leaving the scanner', async ({ page }) => {
 
   await page.getByRole('link', { name: 'AR Product Prototype' }).click()
 
-  await expect(page).toHaveURL('/')
+  await expect(page).toHaveURL('/view-in-ar')
   expect(
     await tracks.evaluate((list) => list.map((track) => track.readyState)),
   ).toEqual(['ended'])

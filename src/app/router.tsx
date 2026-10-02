@@ -1,12 +1,13 @@
 import { Suspense } from 'react'
-import type { RouteObject } from 'react-router'
+import { Navigate, type RouteObject } from 'react-router'
+import { VIEW_IN_AR_PATH } from '../domain/productLink'
 import type { ProductCatalog } from '../usecase/productCatalog'
 import { AppLayout } from '../ui/components/AppLayout'
 import { ErrorPage } from '../ui/pages/ErrorPage'
-import { HomePage } from '../ui/pages/HomePage'
 import { LazyProductPage } from '../ui/pages/LazyProductPage'
 import { NotFoundPage } from '../ui/pages/NotFoundPage'
-import { ScanPage } from '../ui/pages/ScanPage'
+import { QrScanPage } from '../ui/pages/QrScanPage'
+import { ViewInArPage } from '../ui/pages/ViewInArPage'
 
 export function createRoutes(catalog: ProductCatalog): RouteObject[] {
   return [
@@ -14,18 +15,24 @@ export function createRoutes(catalog: ProductCatalog): RouteObject[] {
       element: <AppLayout />,
       errorElement: <ErrorPage />,
       children: [
+        { index: true, element: <Navigate to={VIEW_IN_AR_PATH} replace /> },
         {
-          path: '/',
-          element: <HomePage products={catalog.listProducts()} />,
-        },
-        { path: '/scan', element: <ScanPage /> },
-        {
-          path: '/p/:slug',
-          element: (
-            <Suspense fallback={<output>Loading product…</output>}>
-              <LazyProductPage findProduct={catalog.findProduct} />
-            </Suspense>
-          ),
+          path: VIEW_IN_AR_PATH,
+          children: [
+            {
+              index: true,
+              element: <ViewInArPage products={catalog.listProducts()} />,
+            },
+            { path: 'scan', element: <QrScanPage /> },
+            {
+              path: 'p/:slug',
+              element: (
+                <Suspense fallback={<output>Loading product…</output>}>
+                  <LazyProductPage findProduct={catalog.findProduct} />
+                </Suspense>
+              ),
+            },
+          ],
         },
         { path: '*', element: <NotFoundPage /> },
       ],

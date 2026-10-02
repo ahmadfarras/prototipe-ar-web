@@ -1,6 +1,8 @@
 import { isValidSlug } from './product'
 
-const PRODUCT_PATH_PREFIX = '/p/'
+export const VIEW_IN_AR_PATH = '/view-in-ar'
+
+const PRODUCT_PATH_PREFIX = `${VIEW_IN_AR_PATH}/p/`
 const MAX_LINK_LENGTH = 2048
 
 export function buildProductPath(slug: string): string {

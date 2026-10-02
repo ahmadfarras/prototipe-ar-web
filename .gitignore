@@ -13,3 +13,5 @@ qr/
 .vscode/*
 !.vscode/extensions.json
 .idea
+CLAUDE.md
+docs/specs/

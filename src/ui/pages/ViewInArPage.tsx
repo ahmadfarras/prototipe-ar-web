@@ -1,23 +1,24 @@
 import { Link } from 'react-router'
 import type { Product } from '../../domain/product'
 import { buildProductPath } from '../../domain/productLink'
+import { QR_SCAN_PATH } from '../paths'
 
 type Props = {
   products: readonly Product[]
 }
 
-export function HomePage({ products }: Props) {
+export function ViewInArPage({ products }: Props) {
   return (
     <>
-      <h1 className="text-2xl font-bold text-slate-900">See products in AR</h1>
+      <h1 className="text-2xl font-bold text-slate-900">View product in AR</h1>
       <p className="mt-2 text-slate-600">
         Scan the QR code on a product to place it in your space.
       </p>
       <Link
-        to="/scan"
+        to={QR_SCAN_PATH}
         className="mt-4 flex min-h-11 items-center justify-center rounded-full bg-slate-900 px-6 font-semibold text-white"
       >
-        Scan product
+        Scan QR code
       </Link>
 
       <h2 className="mt-8 text-lg font-semibold text-slate-900">

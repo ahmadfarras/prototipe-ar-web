@@ -4,11 +4,17 @@ import { buildProductQrUrl } from './productQrUrl.mjs'
 
 describe('buildProductQrUrl', () => {
   it.each([
-    ['https://ar.example.com', 'https://ar.example.com/p/chair'],
-    ['https://ar.example.com/', 'https://ar.example.com/p/chair'],
-    ['https://ar.example.com/some/path?x=1', 'https://ar.example.com/p/chair'],
-    ['https://192.168.1.10:5173', 'https://192.168.1.10:5173/p/chair'],
-    ['http://localhost:5173', 'http://localhost:5173/p/chair'],
+    ['https://ar.example.com', 'https://ar.example.com/view-in-ar/p/chair'],
+    ['https://ar.example.com/', 'https://ar.example.com/view-in-ar/p/chair'],
+    [
+      'https://ar.example.com/some/path?x=1',
+      'https://ar.example.com/view-in-ar/p/chair',
+    ],
+    [
+      'https://192.168.1.10:5173',
+      'https://192.168.1.10:5173/view-in-ar/p/chair',
+    ],
+    ['http://localhost:5173', 'http://localhost:5173/view-in-ar/p/chair'],
   ])('builds the product URL from %s', (baseUrl, expected) => {
     expect(buildProductQrUrl(baseUrl, 'chair')).toBe(expected)
   })

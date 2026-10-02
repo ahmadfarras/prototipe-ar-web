@@ -1,14 +1,25 @@
 import { expect, test } from '@playwright/test'
 import { collectErrors } from './console.ts'
 
-test('home lists the demo products and opens one', async ({ page }) => {
-  const errors = collectErrors(page)
+test('the root opens the View product in AR tab', async ({ page }) => {
   await page.goto('/')
+
+  await expect(page).toHaveURL('/view-in-ar')
+  await expect(
+    page
+      .getByRole('navigation', { name: 'Main' })
+      .getByRole('link', { name: 'View product in AR' }),
+  ).toHaveAttribute('aria-current', 'page')
+})
+
+test('the tab lists the demo products and opens one', async ({ page }) => {
+  const errors = collectErrors(page)
+  await page.goto('/view-in-ar')
 
   await expect(page.getByRole('listitem')).toHaveCount(2)
   await page.getByRole('link', { name: /Sheen Chair/ }).click()
 
-  await expect(page).toHaveURL('/p/sheen-chair')
+  await expect(page).toHaveURL('/view-in-ar/p/sheen-chair')
   await expect(
     page.getByRole('heading', { level: 1, name: 'Sheen Chair' }),
   ).toBeVisible()
@@ -17,7 +28,7 @@ test('home lists the demo products and opens one', async ({ page }) => {
 
 test('a product deep link loads its 3D model', async ({ page }) => {
   const errors = collectErrors(page)
-  await page.goto('/p/water-bottle')
+  await page.goto('/view-in-ar/p/water-bottle')
 
   const viewer = page.locator('model-viewer')
   await expect(viewer).toHaveJSProperty('src', '/models/water-bottle.glb')
@@ -30,7 +41,12 @@ test('a product deep link loads its 3D model', async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-for (const path of ['/p/does-not-exist', '/p/..%2F..%2Fetc', '/nope']) {
+for (const path of [
+  '/view-in-ar/p/does-not-exist',
+  '/view-in-ar/p/..%2F..%2Fetc',
+  '/p/sheen-chair',
+  '/nope',
+]) {
   test(`${path} shows not found`, async ({ page }) => {
     const errors = collectErrors(page)
     await page.goto(path)

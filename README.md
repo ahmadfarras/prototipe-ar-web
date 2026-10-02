@@ -5,9 +5,13 @@ placed in your own space in augmented reality.
 
 ## How it works
 
-1. A product carries a QR code that encodes `https://<host>/p/<slug>`.
+Everything below lives under the **View product in AR** tab (`/view-in-ar`).
+The site root redirects there for now.
+
+1. A product carries a QR code that encodes
+   `https://<host>/view-in-ar/p/<slug>`.
 2. Scanning it — with the phone's camera app, or the in-app scanner at
-   `/scan` — opens the product page.
+   `/view-in-ar/scan` — opens the product page.
 3. The page shows the product's 3D model. **View in AR** places it in the
    room at real size.
 
@@ -111,7 +115,7 @@ iPhone/iPad with Safari.
 
 `npm run build` writes static files to `dist/`. Any static host with HTTPS
 works. The host must serve `index.html` for unknown paths so that
-`/p/<slug>` deep links work:
+`/view-in-ar/p/<slug>` deep links work:
 
 - Cloudflare Pages: automatic. `public/_headers` is applied as well.
 - Netlify: add `public/_redirects` containing `/* /index.html 200`.

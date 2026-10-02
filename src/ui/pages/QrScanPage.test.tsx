@@ -3,7 +3,7 @@ import { createMemoryRouter } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ScanError } from '../components/QrScanner'
-import { ScanPage } from './ScanPage'
+import { QrScanPage } from './QrScanPage'
 
 const scanner = vi.hoisted(() => ({
   emitResult: (_text: string) => {},
@@ -24,11 +24,11 @@ vi.mock('../components/QrScanner', () => ({
 function renderScanPage() {
   const router = createMemoryRouter(
     [
-      { path: '/', element: <h1>Home</h1> },
-      { path: '/scan', element: <ScanPage /> },
-      { path: '/p/:slug', element: <h1>Product page</h1> },
+      { path: '/view-in-ar', element: <h1>Products</h1> },
+      { path: '/view-in-ar/scan', element: <QrScanPage /> },
+      { path: '/view-in-ar/p/:slug', element: <h1>Product page</h1> },
     ],
-    { initialEntries: ['/scan'] },
+    { initialEntries: ['/view-in-ar/scan'] },
   )
   const navigate = vi.spyOn(router, 'navigate')
   render(<RouterProvider router={router} />)
@@ -40,7 +40,7 @@ beforeEach(() => {
   scanner.emitError = () => {}
 })
 
-describe('ScanPage', () => {
+describe('QrScanPage', () => {
   it('shows the camera and a hint', () => {
     renderScanPage()
 
@@ -52,13 +52,13 @@ describe('ScanPage', () => {
     const { router, navigate } = renderScanPage()
 
     await act(async () => {
-      scanner.emitResult('https://ar.example.com/p/chair')
-      scanner.emitResult('https://ar.example.com/p/chair')
-      scanner.emitResult('https://ar.example.com/p/wall-art')
+      scanner.emitResult('https://ar.example.com/view-in-ar/p/chair')
+      scanner.emitResult('https://ar.example.com/view-in-ar/p/chair')
+      scanner.emitResult('https://ar.example.com/view-in-ar/p/wall-art')
     })
 
     expect(navigate).toHaveBeenCalledOnce()
-    expect(router.state.location.pathname).toBe('/p/chair')
+    expect(router.state.location.pathname).toBe('/view-in-ar/p/chair')
   })
 
   it.each([
@@ -71,7 +71,7 @@ describe('ScanPage', () => {
     await act(async () => scanner.emitResult(text))
 
     expect(navigate).not.toHaveBeenCalled()
-    expect(router.state.location.pathname).toBe('/scan')
+    expect(router.state.location.pathname).toBe('/view-in-ar/scan')
     expect(screen.getByRole('status')).toHaveTextContent(
       'That QR code is not a product code.',
     )
@@ -84,7 +84,7 @@ describe('ScanPage', () => {
     await act(async () => scanner.emitResult('hello world'))
     await act(async () => scanner.emitResult('chair'))
 
-    expect(router.state.location.pathname).toBe('/p/chair')
+    expect(router.state.location.pathname).toBe('/view-in-ar/p/chair')
   })
 
   it.each([
@@ -101,7 +101,7 @@ describe('ScanPage', () => {
       expect(screen.queryByLabelText('Camera preview')).not.toBeInTheDocument()
       expect(
         screen.getByRole('link', { name: 'Browse products instead' }),
-      ).toHaveAttribute('href', '/')
+      ).toHaveAttribute('href', '/view-in-ar')
     },
   )
 })

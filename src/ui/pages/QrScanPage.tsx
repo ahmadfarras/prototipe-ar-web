@@ -1,6 +1,10 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { buildProductPath, parseProductLink } from '../../domain/productLink'
+import {
+  buildProductPath,
+  parseProductLink,
+  VIEW_IN_AR_PATH,
+} from '../../domain/productLink'
 import { QrScanner, type ScanError } from '../components/QrScanner'
 
 const ERROR_MESSAGES: Record<ScanError, string> = {
@@ -10,7 +14,7 @@ const ERROR_MESSAGES: Record<ScanError, string> = {
     'No camera is available. The scanner needs a camera and a secure (HTTPS) connection.',
 }
 
-export function ScanPage() {
+export function QrScanPage() {
   const navigate = useNavigate()
   const hasNavigated = useRef(false)
   const [error, setError] = useState<ScanError | null>(null)
@@ -31,13 +35,16 @@ export function ScanPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-slate-900">Scan product</h1>
+      <h1 className="text-2xl font-bold text-slate-900">Scan QR code</h1>
       {error ? (
         <>
           <p role="alert" className="mt-2 text-red-700">
             {ERROR_MESSAGES[error]}
           </p>
-          <Link to="/" className="mt-4 inline-block font-semibold underline">
+          <Link
+            to={VIEW_IN_AR_PATH}
+            className="mt-4 inline-block font-semibold underline"
+          >
             Browse products instead
           </Link>
         </>
