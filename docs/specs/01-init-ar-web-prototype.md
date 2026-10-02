@@ -335,17 +335,17 @@ Thin wrapper around the `<model-viewer>` custom element.
 
 ### Phase 4 — 3D assets
 
-- [ ] **P4.1** Choose and download 2 models that meet section 6.7. Write
+- [x] **P4.1** Choose and download 2 models that meet section 6.7. Write
   `public/models/CREDITS.md`.
   *Verify:* licence of each model confirmed from its source page/README.
-- [ ] **P4.2** Optimise each to `public/models/<slug>.glb` within budget.
+- [x] **P4.2** Optimise each to `public/models/<slug>.glb` within budget.
   *Verify:* `ls -l public/models` shows each file ≤ 5 MB;
   `npx gltf-transform inspect <file>` shows texture and triangle budgets met.
-- [ ] **P4.3** Fill `src/adapter/products.json` with the 2 products.
-- [ ] **P4.4** Catalog integrity test (`products.test.ts`): every slug valid
+- [x] **P4.3** Fill `src/adapter/products.json` with the 2 products.
+- [x] **P4.4** Catalog integrity test (`products.test.ts`): every slug valid
   and unique, every `modelUrl` / `iosModelUrl` / `posterUrl` points to an
   existing file under `public/`, `alt` non-empty.
-- [ ] **Phase 4 gate:** `npm run verify` green. Commit:
+- [x] **Phase 4 gate:** `npm run verify` green. Commit:
   `phase 4: sample models and catalog`.
 
 ### Phase 5 — Viewer and pages
