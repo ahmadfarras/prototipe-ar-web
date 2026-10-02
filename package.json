@@ -14,7 +14,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "verify": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run build"
+    "verify": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run build",
+    "qr": "node scripts/generate-qr.mjs",
+    "dev:https": "vite --mode https"
   },
   "dependencies": {
     "@google/model-viewer": "^4.3.1",

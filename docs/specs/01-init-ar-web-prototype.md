@@ -397,14 +397,14 @@ Thin wrapper around the `<model-viewer>` custom element.
 
 ### Phase 7 — QR generation
 
-- [ ] **P7.1** Dev dependency `qrcode` (MIT). `scripts/generate-qr.mjs`:
+- [x] **P7.1** Dev dependency `qrcode` (MIT). `scripts/generate-qr.mjs`:
   takes a base URL argument (must be `http(s)`), reads the catalog, writes
   `qr/<slug>.svg` encoding `<base>/p/<slug>`. Script: `npm run qr -- <base>`.
   Keep the URL-building in a small pure function with a unit test.
-- [ ] **P7.2** *Verify:* run it with `https://example.test`; one SVG per
+- [x] **P7.2** *Verify:* run it with `https://example.test`; one SVG per
   product exists; decoding one (with the scanner library in a test, or
   manually) yields the expected URL.
-- [ ] **Phase 7 gate:** `npm run verify` green. Commit: `phase 7: qr generation`.
+- [x] **Phase 7 gate:** `npm run verify` green. Commit: `phase 7: qr generation`.
 
 ### Phase 8 — Phone testing and deploy readiness
 
