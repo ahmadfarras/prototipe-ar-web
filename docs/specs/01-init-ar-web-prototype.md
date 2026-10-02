@@ -350,49 +350,49 @@ Thin wrapper around the `<model-viewer>` custom element.
 
 ### Phase 5 — Viewer and pages
 
-- [ ] **P5.1** Install `@google/model-viewer` and `react-router`. Add
+- [x] **P5.1** Install `@google/model-viewer` and `react-router`. Add
   `src/types/model-viewer.d.ts`.
   *Verify:* `npm run typecheck` green with a `<model-viewer>` in JSX.
-- [ ] **P5.2** `ModelViewer` component per 6.5. Component tests: renders the
+- [x] **P5.2** `ModelViewer` component per 6.5. Component tests: renders the
   element with `src`, `alt`, `ar-placement` from the product; `ios-src` and
   `poster` absent when not provided; AR-unavailable note appears after `load`
   when `canActivateAR` is false; error state on `error` event. (Mock the
   `@google/model-viewer` import in jsdom.)
-- [ ] **P5.3** `NotFoundPage` and `HomePage` per 6.4, with tests (links by
+- [x] **P5.3** `NotFoundPage` and `HomePage` per 6.4, with tests (links by
   role, product list from an injected `listProducts`).
-- [ ] **P5.4** `ProductPage` per 6.4, with tests: known slug shows name and
+- [x] **P5.4** `ProductPage` per 6.4, with tests: known slug shows name and
   viewer; unknown slug and invalid slug show not-found.
-- [ ] **P5.5** `src/app/router.tsx` with the four routes, `ProductPage` lazy
+- [x] **P5.5** `src/app/router.tsx` with the four routes, `ProductPage` lazy
   with a `<Suspense>` fallback, and a route error element. Wire in `main.tsx`.
-- [ ] **P5.6** Mobile-first styling: readable at 360 px width, viewer fills
+- [x] **P5.6** Mobile-first styling: readable at 360 px width, viewer fills
   most of the viewport height, AR button ≥ 44 px touch target, visible focus.
-- [ ] **P5.7** E2E `e2e/product.spec.ts`: `/` lists products and links work;
+- [x] **P5.7** E2E `e2e/product.spec.ts`: `/` lists products and links work;
   `/p/<slug>` shows the product and the model finishes loading (wait for the
   element's `loaded` state; if headless WebGL is unavailable, assert the
   element and its `src` instead and note that in the Progress log);
   `/p/unknown` and `/nope` show not-found; no console errors on any page.
-- [ ] **P5.8** Build check: `npm run build` output shows `model-viewer` in a
+- [x] **P5.8** Build check: `npm run build` output shows `model-viewer` in a
   separate chunk from the entry chunk.
-- [ ] **Phase 5 gate:** `npm run verify` and `npm run test:e2e` green.
+- [x] **Phase 5 gate:** `npm run verify` and `npm run test:e2e` green.
   Commit: `phase 5: viewer and pages`.
 
 ### Phase 6 — In-app scanner
 
-- [ ] **P6.1** Install the scanner library (D4). `npm audit` again.
-- [ ] **P6.2** `QrScanner` component per 6.6. Tests with the library mocked:
+- [x] **P6.1** Install the scanner library (D4). `npm audit` again.
+- [x] **P6.2** `QrScanner` component per 6.6. Tests with the library mocked:
   starts on mount, `stop` + `destroy` on unmount, exactly one live instance
   under StrictMode, maps permission and no-camera failures to `ScanError`.
-- [ ] **P6.3** `ScanPage` per 6.4 and 6.6. Tests: valid result navigates to
+- [x] **P6.3** `ScanPage` per 6.4 and 6.6. Tests: valid result navigates to
   `/p/<slug>` once even if `onResult` fires repeatedly; unrecognised QR shows
   the inline message and does not navigate; a foreign-site URL without a
   `/p/<slug>` path does not navigate; each `ScanError` shows its message and
   the link home.
-- [ ] **P6.4** E2E `e2e/scan.spec.ts`: with camera permission denied, `/scan`
+- [x] **P6.4** E2E `e2e/scan.spec.ts`: with camera permission denied, `/scan`
   shows the denied state and the link home works. Optional stretch: launch
   Chromium with `--use-fake-device-for-media-stream
   --use-fake-ui-for-media-stream --use-file-for-fake-video-capture=<file>`
   feeding a video of a product QR, and assert navigation to `/p/<slug>`.
-- [ ] **Phase 6 gate:** `npm run verify` and `npm run test:e2e` green.
+- [x] **Phase 6 gate:** `npm run verify` and `npm run test:e2e` green.
   Commit: `phase 6: in-app qr scanner`.
 
 ### Phase 7 — QR generation

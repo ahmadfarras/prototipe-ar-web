@@ -4,6 +4,10 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    // model-viewer bundles three.js; it is lazy-loaded with the product page.
+    chunkSizeWarningLimit: 1100,
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
