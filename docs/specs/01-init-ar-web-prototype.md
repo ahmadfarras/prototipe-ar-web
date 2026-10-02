@@ -265,7 +265,7 @@ Thin wrapper around the `<model-viewer>` custom element.
 > Never run `create-vite` with `--overwrite` in the project root — it empties
 > the directory and would delete this spec.
 
-- [ ] **P1.1** Scaffold into a subfolder:
+- [x] **P1.1** Scaffold into a subfolder:
   `npm create vite@latest .scaffold -- --template react-ts`. If the CLI
   prompts, decline "install and start now". Move every file (including
   dotfiles, excluding any `.git`) from `.scaffold/` to the root, without
@@ -273,13 +273,13 @@ Thin wrapper around the `<model-viewer>` custom element.
   `.scaffold/`.
   *Verify:* `package.json`, `vite.config.ts`, `src/main.tsx` at root;
   `.scaffold/` gone; this spec still present.
-- [ ] **P1.2** Set `package.json` `name` to `prototype-ar-product`,
+- [x] **P1.2** Set `package.json` `name` to `prototype-ar-product`,
   `private: true`. Run `npm install`.
   *Verify:* `npm run build` succeeds.
-- [ ] **P1.3** Remove template demo content (`App.css`, logos, counter demo).
+- [x] **P1.3** Remove template demo content (`App.css`, logos, counter demo).
   Keep `StrictMode` in `main.tsx`.
   *Verify:* `npm run build` succeeds; no unused asset files in `src/assets`.
-- [ ] **P1.4** Commit: `phase 1: scaffold vite react-ts`.
+- [x] **P1.4** Commit: `phase 1: scaffold vite react-ts`.
 
 ### Phase 2 — Tooling
 

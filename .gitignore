@@ -3,9 +3,13 @@ dist
 coverage
 test-results
 playwright-report
+*.log
+*.local
 .env*
 !.env.example
 qr/
 .scaffold/
 .DS_Store
-*.local
+.vscode/*
+!.vscode/extensions.json
+.idea
