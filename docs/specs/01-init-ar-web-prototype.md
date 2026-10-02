@@ -315,22 +315,22 @@ Thin wrapper around the `<model-viewer>` custom element.
 
 ### Phase 3 — Domain, use case, adapter (no UI)
 
-- [ ] **P3.1** `src/domain/product.ts`: `Product`, `SLUG_PATTERN`,
+- [x] **P3.1** `src/domain/product.ts`: `Product`, `SLUG_PATTERN`,
   `isValidSlug`. Tests: valid slugs, empty, uppercase, spaces, leading or
   trailing hyphen, double hyphen, 64 vs 65 chars, path characters (`../`).
-- [ ] **P3.2** `src/domain/productLink.ts`: `buildProductPath`,
+- [x] **P3.2** `src/domain/productLink.ts`: `buildProductPath`,
   `parseProductLink`. Tests (table-driven): absolute URL on any host, bare
   slug, trailing slash, extra path segments, query/hash present, wrong prefix,
   `javascript:` URL, empty string, whitespace, very long input, invalid slug
   inside a valid URL. Must never throw.
-- [ ] **P3.3** `src/usecase/productCatalog.ts`: port + `findProduct`,
+- [x] **P3.3** `src/usecase/productCatalog.ts`: port + `findProduct`,
   `listProducts`. Tests with an in-memory fake: found, unknown, invalid slug
   does not call the repository.
-- [ ] **P3.4** `src/adapter/staticProductRepository.ts`. Tests: lookup hit and
+- [x] **P3.4** `src/adapter/staticProductRepository.ts`. Tests: lookup hit and
   miss, `list()` order, duplicate slug in input throws at construction.
-- [ ] **P3.5** `src/app/container.ts` wiring the static repository to the use
+- [x] **P3.5** `src/app/container.ts` wiring the static repository to the use
   cases (catalog JSON may still be empty or hold placeholders until Phase 4).
-- [ ] **Phase 3 gate:** `npm run verify` green. Commit:
+- [x] **Phase 3 gate:** `npm run verify` green. Commit:
   `phase 3: product domain and catalog`.
 
 ### Phase 4 — 3D assets
