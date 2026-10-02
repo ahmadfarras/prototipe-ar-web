@@ -408,24 +408,24 @@ Thin wrapper around the `<model-viewer>` custom element.
 
 ### Phase 8 — Phone testing and deploy readiness
 
-- [ ] **P8.1** HTTPS dev mode for phones on the LAN: `@vitejs/plugin-basic-ssl`
+- [x] **P8.1** HTTPS dev mode for phones on the LAN: `@vitejs/plugin-basic-ssl`
   enabled only when `mode === 'https'`, with `server.host: true`. Script
   `dev:https` = `vite --mode https`. Plain `npm run dev` stays HTTP on
   localhost.
   *Verify:* `npm run dev:https` prints an `https://<lan-ip>:<port>` URL.
-- [ ] **P8.2** `public/_headers` (Cloudflare Pages / Netlify format) for `/*`:
+- [x] **P8.2** `public/_headers` (Cloudflare Pages / Netlify format) for `/*`:
   `X-Content-Type-Options: nosniff`,
   `Referrer-Policy: strict-origin-when-cross-origin`,
   `Permissions-Policy: camera=(self), xr-spatial-tracking=(self)`.
   Long-lived immutable cache for `/assets/*`.
   *Verify:* file is copied to `dist/` by the build.
-- [ ] **P8.3** `README.md`: what the prototype does, the user flow, scripts,
+- [x] **P8.3** `README.md`: what the prototype does, the user flow, scripts,
   how to add a product (drop a GLB, add a catalog entry, run `npm run qr`),
   how to test on a phone (`dev:https`, certificate warning, or a tunnel),
   device requirements (ARCore Android / iPhone), hosting notes (HTTPS
   required; SPA fallback to `index.html` — automatic on Cloudflare Pages,
   needs a `_redirects` rule on Netlify), asset budgets.
-- [ ] **Phase 8 gate:** `npm run verify` green. Commit:
+- [x] **Phase 8 gate:** `npm run verify` green. Commit:
   `phase 8: phone testing and deploy readiness`.
 
 ### Phase 9 — Final verification (the three gates)
