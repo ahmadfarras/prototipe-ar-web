@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Not started |
+| Status | Done — awaiting device check (Phase 10) |
 | Created | 2026-10-02 |
 | Project root | The repository root |
 | Executor | A Claude Code session (may be interrupted and resumed by another session) |
@@ -430,18 +430,18 @@ Thin wrapper around the `<model-viewer>` custom element.
 
 ### Phase 9 — Final verification (the three gates)
 
-- [ ] **P9.1 Gate 1:** `npm run verify` and `npm run test:e2e` — all green,
+- [x] **P9.1 Gate 1:** `npm run verify` and `npm run test:e2e` — all green,
   0 lint warnings. Paste the summary lines into the Progress log.
-- [ ] **P9.2 Gate 2 (live run):** `npm run build && npm run preview`, then in
+- [x] **P9.2 Gate 2 (live run):** `npm run build && npm run preview`, then in
   a real browser (built-in browser tools) at mobile width:
   `/` renders and lists products; a product page loads its model with no
   console errors; `/p/does-not-exist` and `/p/..%2F..%2Fetc` show not-found;
   `/scan` with camera blocked shows the denied state; `/scan` navigates away
   and back without leaving the camera indicator on. Record results.
-- [ ] **P9.3 Gate 3:** state explicitly in the delivery summary: *no API and
+- [x] **P9.3 Gate 3:** state explicitly in the delivery summary: *no API and
   no database in this spec — nothing persisted, nothing to verify*.
-- [ ] **P9.4** Comment audit: remove every comment that restates the code.
-- [ ] **P9.5** Delivery summary (format from `senior-engineer` section 9)
+- [x] **P9.4** Comment audit: remove every comment that restates the code.
+- [x] **P9.5** Delivery summary (format from `senior-engineer` section 9)
   appended to the Progress log. Set Status at the top to
   `Done — awaiting device check`. Commit: `phase 9: verification`.
 
@@ -507,7 +507,16 @@ Not used in this spec. Any future spec that adds an API or database must:
 
 | Date | Task | Deviation | Reason |
 |---|---|---|---|
-| | | | |
+| 2026-10-02 | P2.2 | Oxlint instead of ESLint (`react`, `typescript`, `oxc`, `jsx-a11y` plugins; `react/rules-of-hooks` and `react/exhaustive-deps` as errors; `--deny-warnings`). No `eslint-config-prettier`. | The current Vite `react-ts` template ships Oxlint, not ESLint. Kept the template's linter rather than adding a second one. |
+| 2026-10-02 | P4.2 / 6.7 | Geometry left uncompressed; textures kept in their original format. `sheen-chair.glb` is the unmodified source file (re-encoding made it larger). | Meshopt/Draco/WebP need extra decoders in the web viewer and are not guaranteed in Android Scene Viewer or the generated iOS model. Both files are within budget without them. |
+| 2026-10-02 | P4.1 | Both sample products use `floor` placement. | No suitable CC0 wall model in the Khronos samples. |
+| 2026-10-02 | 6.2 / P5.3 | `HomePage` takes `products` (data) instead of a `listProducts` function. Routes are built by `createRoutes(catalog)` in `src/app/router.tsx`; `main.tsx` creates the browser router. | Simpler props; the same route table is used by the app and by the route tests. |
+| 2026-10-02 | 6.6 | `ScanError` is `'permission-denied' \| 'no-camera'` (no `'unknown'`). | `qr-scanner` rejects every camera failure with the same string; the two cases are told apart with `QrScanner.hasCamera()`. |
+| 2026-10-02 | 6.6 | Cleanup calls `scanner.pause(true)` before `destroy()`. | `destroy()` alone releases the camera only after 300 ms (found by the E2E camera-release test). |
+| 2026-10-02 | 6.5 | Status messages use `<output>` instead of `role="status"`. | Required by the `jsx-a11y/prefer-tag-over-role` lint rule. |
+| 2026-10-02 | P6.4 | E2E simulates the camera by replacing `getUserMedia` with a canvas stream showing a real QR code. | Headless Chromium's fake capture device returns `NotSupportedError`. This also made the stretch goal (real decode → navigation) a normal test. |
+| 2026-10-02 | Phases 5–6 | One commit for both phases. | The route table imports the scan page, so the phases could not be verified separately. |
+| 2026-10-02 | D9 | Kept `@google/model-viewer` 4.3.1 although it prints debug `console.log` lines (4.2.0 does not). | Latest stable; logs are not errors. Pin 4.2.0 if the noise matters. |
 
 ## 13. Progress log
 
@@ -518,3 +527,8 @@ checks, open problems).
 | Date | Phase / task | Notes |
 |---|---|---|
 | 2026-10-02 | Spec written | Project folder was empty. Node v26.0.0, npm 11.12.1, git 2.51.2; no pnpm/bun. Nothing scaffolded yet. Next: P0.1. |
+| 2026-10-02 | Phases 0–2 | Scaffolded with create-vite 9.2.1. Resolved: vite 8.3.2, react 19.3.0, typescript 6.0.3, tailwindcss 4.3.3, vitest 5.0.3, @playwright/test 1.63.0, oxlint 1.86.0, prettier 3.9.9. `npm audit`: 0 vulnerabilities. |
+| 2026-10-02 | Phases 3–4 | Domain, use case, static repository with tests. Models: Sheen Chair (4.1 MB) and Water Bottle (2.0 MB), both CC0 from Khronos glTF Sample Assets. |
+| 2026-10-02 | Phases 5–8 | react-router 8.4.0, @google/model-viewer 4.3.1, qr-scanner 1.4.2, qrcode 1.5.4, @vitejs/plugin-basic-ssl 2.3.0. `model-viewer` is in its own lazy chunk (`ProductPage-*.js`, ~1.0 MB / 291 kB gzip); entry chunk 333 kB / 106 kB gzip. `npm run dev:https` served HTTP 200 on `https://localhost:5173`. |
+| 2026-10-02 | Phase 9 | **Gate 1:** `npm run verify` exit 0 — typecheck, lint (0 warnings), format, 11 test files / 92 tests, build. `npm run test:e2e` exit 0 — 9 passed (Chromium, Pixel 7 emulation). **Gate 2:** preview build opened in the built-in browser at 375×812: home lists 2 products; both product pages render their model; `/p/does-not-exist` and `/p/..%2F..%2Fetc` show Not found; no console errors. Blocked-camera state, QR decode → product page, foreign-site QR ignored and camera release on leaving `/scan` were verified in Playwright, not by hand. **Gate 3:** no API and no database in this spec — nothing persisted, nothing to verify. Comment audit: 2 comments remain, both explain a why. |
+| 2026-10-02 | Delivery | Layers: `domain` (product, productLink), `usecase` (productCatalog + port), `adapter` (static repository, JSON catalog), `ui` (pages, ModelViewer, QrScanner), `app` (composition root, routes). OWASP: untrusted QR/route input is reduced to an allow-listed slug and never used as a navigation target or HTML (A03, A10); model URLs come only from the catalog; no secrets, no storage. Not done: Phase 10 (real Android/iPhone AR) — needs the owner. AR itself has never been launched on a device. |

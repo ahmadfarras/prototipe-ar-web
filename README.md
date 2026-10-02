@@ -26,16 +26,16 @@ Format: Prettier.
 
 ## Scripts
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | Dev server on `http://localhost:5173` |
-| `npm run dev:https` | Dev server over HTTPS on your LAN, for testing on a phone |
-| `npm run build` / `npm run preview` | Production build and local preview |
-| `npm run verify` | Typecheck, lint, format check, unit tests, build |
-| `npm run test` | Unit and component tests |
-| `npm run test:e2e` | Playwright tests against the production build |
-| `npm run qr -- <base-url>` | Write one QR code per product to `qr/` |
-| `npm run format` | Format the code |
+| Command                             | What it does                                              |
+| ----------------------------------- | --------------------------------------------------------- |
+| `npm run dev`                       | Dev server on `http://localhost:5173`                     |
+| `npm run dev:https`                 | Dev server over HTTPS on your LAN, for testing on a phone |
+| `npm run build` / `npm run preview` | Production build and local preview                        |
+| `npm run verify`                    | Typecheck, lint, format check, unit tests, build          |
+| `npm run test`                      | Unit and component tests                                  |
+| `npm run test:e2e`                  | Playwright tests against the production build             |
+| `npm run qr -- <base-url>`          | Write one QR code per product to `qr/`                    |
+| `npm run format`                    | Format the code                                           |
 
 ## Project layout
 
@@ -71,6 +71,7 @@ to an API later, add a new adapter that implements `ProductRepository`.
 
    `slug` is lowercase letters, digits and single hyphens. `placement` is
    `floor` or `wall`. Optional: `iosModelUrl` (a `.usdz`) and `posterUrl`.
+
 3. Run `npm run test` — a catalog test checks slugs and file paths.
 4. Run `npm run qr -- https://your-host` and print `qr/<slug>.svg`.
 
