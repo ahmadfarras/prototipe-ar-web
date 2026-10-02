@@ -1,0 +1,32 @@
+{
+  "products": [
+    {
+      "slug": "wizard-of-oz",
+      "name": "The Wonderful Wizard of Oz",
+      "summary": "L. Frank Baum's 1900 classic, first edition cover.",
+      "description": "Dorothy and her dog Toto are carried by a cyclone from Kansas to the Land of Oz. To get home she follows the yellow brick road to the Emerald City with the Scarecrow, the Tin Woodman and the Cowardly Lion.\n\nThis edition reproduces the original 1900 cover and colour plates by W. W. Denslow.",
+      "targets": [{ "index": 0, "imageFile": "wizard-of-oz.jpg" }],
+      "coupon": {
+        "title": "15% off The Wonderful Wizard of Oz",
+        "terms": "One coupon per visitor. Valid for one copy while stocks last.",
+        "totalQuantity": 100,
+        "startsAt": "2026-01-01T00:00:00Z",
+        "endsAt": "2030-01-01T00:00:00Z"
+      }
+    },
+    {
+      "slug": "peter-rabbit",
+      "name": "The Tale of Peter Rabbit",
+      "summary": "Beatrix Potter's 1902 picture book, first edition cover.",
+      "description": "Peter Rabbit disobeys his mother, squeezes under the gate into Mr. McGregor's garden and has to run for his life among the cabbages and the cucumber frames.\n\nWritten and illustrated by Beatrix Potter, first published by Frederick Warne & Co. in 1902.",
+      "targets": [{ "index": 1, "imageFile": "peter-rabbit.jpg" }],
+      "coupon": {
+        "title": "Free bookmark with The Tale of Peter Rabbit",
+        "terms": "One coupon per visitor. Show the code at the counter.",
+        "totalQuantity": 50,
+        "startsAt": "2026-01-01T00:00:00Z",
+        "endsAt": "2030-01-01T00:00:00Z"
+      }
+    }
+  ]
+}
