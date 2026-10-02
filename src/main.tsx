@@ -4,6 +4,6 @@ import './index.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <h1>AR product prototype</h1>
+    <h1 className="text-3xl font-bold underline">AR product prototype</h1>
   </StrictMode>,
 )

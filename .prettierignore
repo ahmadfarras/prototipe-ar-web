@@ -1,0 +1,8 @@
+dist
+coverage
+docs
+qr
+public/models
+playwright-report
+test-results
+package-lock.json

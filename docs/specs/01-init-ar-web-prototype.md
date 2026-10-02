@@ -283,35 +283,35 @@ Thin wrapper around the `<model-viewer>` custom element.
 
 ### Phase 2 — Tooling
 
-- [ ] **P2.1** TypeScript strict: confirm `strict: true`,
+- [x] **P2.1** TypeScript strict: confirm `strict: true`,
   `noUncheckedIndexedAccess: true`, `resolveJsonModule: true`. Add script
   `typecheck` (`tsc -b --noEmit` or the template's equivalent).
   *Verify:* `npm run typecheck` exits 0.
-- [ ] **P2.2** ESLint: keep the template's flat config with `react-hooks`;
+- [x] **P2.2** ESLint: keep the template's flat config with `react-hooks`;
   add `eslint-plugin-jsx-a11y` (recommended) and `eslint-config-prettier`.
   Script `lint` = `eslint . --max-warnings 0`.
   *Verify:* `npm run lint` exits 0.
-- [ ] **P2.3** Prettier with a minimal `.prettierrc`; scripts `format` and
+- [x] **P2.3** Prettier with a minimal `.prettierrc`; scripts `format` and
   `format:check`.
   *Verify:* `npm run format:check` exits 0.
-- [ ] **P2.4** Tailwind v4: install `tailwindcss` + `@tailwindcss/vite`, add
+- [x] **P2.4** Tailwind v4: install `tailwindcss` + `@tailwindcss/vite`, add
   the plugin, `@import "tailwindcss";` in `src/index.css`.
   *Verify:* a utility class changes the rendered page in `npm run dev`.
-- [ ] **P2.5** Vitest: install `vitest`, `jsdom`, `@testing-library/react`,
+- [x] **P2.5** Vitest: install `vitest`, `jsdom`, `@testing-library/react`,
   `@testing-library/user-event`, `@testing-library/jest-dom`; configure the
   `test` block (environment `jsdom`, setup file, exclude `e2e/`). Scripts
   `test` (`vitest run`) and `test:watch`.
   *Verify:* a trivial test passes, then delete it.
-- [ ] **P2.6** Playwright: install `@playwright/test`, install Chromium,
+- [x] **P2.6** Playwright: install `@playwright/test`, install Chromium,
   `playwright.config.ts` with `webServer` = `npm run build && npm run preview`
   and one mobile project (Pixel-class viewport). Script `test:e2e`.
   *Verify:* `npm run test:e2e` runs (zero or one smoke spec) and exits 0.
-- [ ] **P2.7** Script `verify` =
+- [x] **P2.7** Script `verify` =
   `typecheck && lint && format:check && test && build`.
   *Verify:* `npm run verify` exits 0.
-- [ ] **P2.8** Run `npm audit`; resolve or record high/critical findings.
+- [x] **P2.8** Run `npm audit`; resolve or record high/critical findings.
   *Verify:* result written to the Progress log.
-- [ ] **P2.9** Commit: `phase 2: tooling`.
+- [x] **P2.9** Commit: `phase 2: tooling`.
 
 ### Phase 3 — Domain, use case, adapter (no UI)
 
