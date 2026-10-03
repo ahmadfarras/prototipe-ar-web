@@ -3,11 +3,15 @@ import userEvent from '@testing-library/user-event'
 import { createMemoryRouter } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 import { describe, expect, it, vi } from 'vitest'
-import { chair, wallArt } from '../test/fixtures'
+import { chair, manifest, wallArt } from '../test/fixtures'
 import type { ProductCatalog } from '../usecase/productCatalog'
+import type { ProductExperiences } from '../usecase/productExperience'
 import { createRoutes } from './router'
 
 vi.mock('@google/model-viewer', () => ({}))
+vi.mock('../ui/components/TargetTracker', () => ({
+  TargetTracker: () => <div>Camera view</div>,
+}))
 vi.mock('../ui/components/QrScanner', () => ({
   QrScanner: () => <video aria-label="Camera preview" muted />,
 }))
@@ -17,8 +21,14 @@ const catalog: ProductCatalog = {
   listProducts: () => [chair, wallArt],
 }
 
+const experiences: ProductExperiences = {
+  loadManifest: async () => manifest,
+  getExperience: async () => null,
+  claimCoupon: async () => ({ kind: 'failed' }),
+}
+
 function renderAt(path: string) {
-  const router = createMemoryRouter(createRoutes(catalog), {
+  const router = createMemoryRouter(createRoutes(catalog, experiences), {
     initialEntries: [path],
   })
   render(<RouterProvider router={router} />)
@@ -26,16 +36,50 @@ function renderAt(path: string) {
 }
 
 describe('routes', () => {
-  it('opens the View product in AR tab from the root', async () => {
+  it('opens the Scan product tab from the root', async () => {
     const router = renderAt('/')
 
     expect(
-      await screen.findByRole('heading', {
-        level: 1,
-        name: 'View product in AR',
-      }),
+      await screen.findByRole('heading', { level: 1, name: 'Scan product' }),
     ).toBeVisible()
+    expect(router.state.location.pathname).toBe('/scan')
+  })
+
+  it('marks only the Scan product tab as current on /scan', async () => {
+    renderAt('/scan')
+
+    const nav = screen.getByRole('navigation', { name: 'Main' })
+    expect(
+      await within(nav).findByRole('link', { name: 'Scan product' }),
+    ).toHaveAttribute('aria-current', 'page')
+    expect(
+      within(nav).getByRole('link', { name: 'View product in AR' }),
+    ).not.toHaveAttribute('aria-current')
+  })
+
+  it('switches between the two tabs', async () => {
+    const router = renderAt('/scan')
+    const nav = screen.getByRole('navigation', { name: 'Main' })
+
+    await userEvent.click(
+      within(nav).getByRole('link', { name: 'View product in AR' }),
+    )
     expect(router.state.location.pathname).toBe('/view-in-ar')
+
+    await userEvent.click(
+      within(nav).getByRole('link', { name: 'Scan product' }),
+    )
+    expect(router.state.location.pathname).toBe('/scan')
+  })
+
+  it('starts the product scanner from the Scan product tab', async () => {
+    renderAt('/scan')
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Start camera' }),
+    )
+
+    expect(await screen.findByText('Camera view')).toBeVisible()
   })
 
   it.each(['/view-in-ar', '/view-in-ar/scan', '/view-in-ar/p/chair'])(
@@ -50,6 +94,15 @@ describe('routes', () => {
     },
   )
 
+  it('does not mark the Scan product tab as current in the other section', () => {
+    renderAt('/view-in-ar')
+
+    const nav = screen.getByRole('navigation', { name: 'Main' })
+    expect(
+      within(nav).getByRole('link', { name: 'Scan product' }),
+    ).not.toHaveAttribute('aria-current')
+  })
+
   it('does not mark the tab as current outside the section', () => {
     renderAt('/nope')
 
@@ -60,7 +113,7 @@ describe('routes', () => {
   })
 
   it('lists every product on the home page', () => {
-    renderAt('/')
+    renderAt('/view-in-ar')
 
     const list = screen.getByRole('list')
     expect(within(list).getAllByRole('listitem')).toHaveLength(2)
@@ -73,7 +126,7 @@ describe('routes', () => {
   })
 
   it('opens the scanner from the home page', async () => {
-    renderAt('/')
+    renderAt('/view-in-ar')
 
     await userEvent.click(screen.getByRole('link', { name: 'Scan QR code' }))
 
@@ -84,7 +137,7 @@ describe('routes', () => {
   })
 
   it('opens a product from the home page', async () => {
-    renderAt('/')
+    renderAt('/view-in-ar')
 
     await userEvent.click(screen.getByRole('link', { name: /Lounge Chair/ }))
 
@@ -112,7 +165,7 @@ describe('routes', () => {
     '/view-in-ar/p/..%2F..%2Fetc',
     '/view-in-ar/p',
     '/p/chair',
-    '/scan',
+    '/scan/extra',
     '/nope',
   ])('shows not found for %s', async (path) => {
     renderAt(path)
@@ -128,7 +181,7 @@ describe('routes', () => {
   })
 
   it('moves focus to the main content after navigation', async () => {
-    renderAt('/')
+    renderAt('/view-in-ar')
 
     await userEvent.click(screen.getByRole('link', { name: 'Scan QR code' }))
 

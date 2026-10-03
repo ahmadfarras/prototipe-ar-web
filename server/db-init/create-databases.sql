@@ -1,0 +1,2 @@
+CREATE DATABASE ar_test;
+CREATE DATABASE ar_e2e;

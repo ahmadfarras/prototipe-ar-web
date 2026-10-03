@@ -1,26 +1,11 @@
 import { expect, test, type Page } from '@playwright/test'
 import QRCode from 'qrcode'
+import { showImageToCamera } from './camera.ts'
 import { collectErrors } from './console.ts'
 
 async function showQrToCamera(page: Page, text: string) {
   const qr = await QRCode.toDataURL(text, { width: 320, margin: 2 })
-  await page.addInitScript((qrDataUrl) => {
-    const size = 480
-    const canvas = document.createElement('canvas')
-    canvas.width = size
-    canvas.height = size
-    const context = canvas.getContext('2d')!
-    const image = new Image()
-    image.src = qrDataUrl
-    const draw = () => {
-      context.fillStyle = '#fff'
-      context.fillRect(0, 0, size, size)
-      if (image.complete) context.drawImage(image, 80, 80)
-      requestAnimationFrame(draw)
-    }
-    draw()
-    navigator.mediaDevices.getUserMedia = async () => canvas.captureStream(15)
-  }, qr)
+  await showImageToCamera(page, qr, { width: 480, height: 480 })
 }
 
 test('explains a blocked camera and links back to the products', async ({
@@ -74,7 +59,7 @@ test('releases the camera when leaving the scanner', async ({ page }) => {
 
   await page.getByRole('link', { name: 'AR Product Prototype' }).click()
 
-  await expect(page).toHaveURL('/view-in-ar')
+  await expect(page).toHaveURL('/scan')
   expect(
     await tracks.evaluate((list) => list.map((track) => track.readyState)),
   ).toEqual(['ended'])

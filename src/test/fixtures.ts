@@ -1,4 +1,6 @@
+import type { ClaimedCoupon, ProductExperience } from '../domain/experience'
 import type { Product } from '../domain/product'
+import type { TargetManifest } from '../domain/targetManifest'
 
 export const chair: Product = {
   slug: 'chair',
@@ -18,4 +20,29 @@ export const wallArt: Product = {
   posterUrl: '/models/wall-art.webp',
   alt: '3D model of a framed print',
   placement: 'wall',
+}
+
+export const bookExperience: ProductExperience = {
+  slug: 'book',
+  name: 'Sample Book',
+  summary: 'A short summary.',
+  description: 'A longer description.',
+  coupon: {
+    title: '10% off',
+    terms: 'One per visitor.',
+    endsAt: '2030-01-01T00:00:00.000Z',
+    status: 'available',
+  },
+}
+
+export const bookCoupon: ClaimedCoupon = {
+  code: 'AAAA-BBBB-CCCC',
+  title: '10% off',
+  terms: 'One per visitor.',
+  endsAt: '2030-01-01T00:00:00.000Z',
+}
+
+export const manifest: TargetManifest = {
+  mindUrl: '/targets/targets-07a7ebdd.mind',
+  slugs: ['book', 'box'],
 }

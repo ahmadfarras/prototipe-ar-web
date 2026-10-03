@@ -6,3 +6,5 @@ public/models
 playwright-report
 test-results
 package-lock.json
+src/vendor
+public/targets

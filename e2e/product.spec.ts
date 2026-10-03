@@ -1,15 +1,31 @@
 import { expect, test } from '@playwright/test'
 import { collectErrors } from './console.ts'
 
-test('the root opens the View product in AR tab', async ({ page }) => {
+test('the root opens the Scan product tab and the tabs switch sections', async ({
+  page,
+}) => {
+  const nav = page.getByRole('navigation', { name: 'Main' })
   await page.goto('/')
+
+  await expect(page).toHaveURL('/scan')
+  await expect(nav.getByRole('link', { name: 'Scan product' })).toHaveAttribute(
+    'aria-current',
+    'page',
+  )
+
+  await nav.getByRole('link', { name: 'View product in AR' }).click()
 
   await expect(page).toHaveURL('/view-in-ar')
   await expect(
-    page
-      .getByRole('navigation', { name: 'Main' })
-      .getByRole('link', { name: 'View product in AR' }),
+    nav.getByRole('link', { name: 'View product in AR' }),
   ).toHaveAttribute('aria-current', 'page')
+
+  await nav.getByRole('link', { name: 'Scan product' }).click()
+
+  await expect(page).toHaveURL('/scan')
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Scan product' }),
+  ).toBeVisible()
 })
 
 test('the tab lists the demo products and opens one', async ({ page }) => {

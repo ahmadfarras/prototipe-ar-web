@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ar
+      POSTGRES_PASSWORD: ar
+      POSTGRES_DB: ar_dev
+    ports:
+      - '127.0.0.1:54329:5432'
+    volumes:
+      - db-data:/var/lib/postgresql
+      - ./server/db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # -h forces TCP: the init-time server only listens on the socket.
+      test: ['CMD-SHELL', 'pg_isready -h 127.0.0.1 -U ar -d ar_dev']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  db-data:
