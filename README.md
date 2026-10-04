@@ -241,8 +241,13 @@ In the GitHub repository, add four secrets:
 Get the fingerprint on the server itself, so it cannot be spoofed:
 
 ```bash
-ssh-keygen -l -f /etc/ssh/ssh_host_ed25519_key.pub | cut -d ' ' -f2
+ssh-keygen -l -f /etc/ssh/ssh_host_ecdsa_key.pub | cut -d ' ' -f2
 ```
+
+Use the ECDSA key: that is the host key type the deploy action asks the
+server for when the server has one. If the deploy fails with "host key
+fingerprint mismatch", the server offered another type; take the fingerprint
+of `ssh_host_ed25519_key.pub` or `ssh_host_rsa_key.pub` instead.
 
 On the server:
 

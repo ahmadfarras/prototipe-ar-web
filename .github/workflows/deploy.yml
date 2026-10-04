@@ -121,7 +121,7 @@ jobs:
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
 
             # docker-compose.yml and .env are placed here once, by hand.
-            cd ~/ar-product
+            cd ~/prototipe-ar-web
 
             docker-compose pull
             # Runs the migrations, then starts or replaces the API and web containers.
