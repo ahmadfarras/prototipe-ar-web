@@ -1,21 +1,88 @@
+# Settings come from .env (copy .env.example). The images are built and pushed by .github/workflows/deploy.yml, which
+# deploys the tag of its own commit. Run by hand, the latest image is used;
+# to roll back:  IMAGE_TAG=sha-<commit> docker-compose up -d
+
+x-logging: &logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: '3'
+
+# The application containers need no write access, no Linux capabilities and
+# no way to gain privileges.
+x-hardening: &hardening
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  pids_limit: 200
+
+# Shared by the two services that run the API image: migrate and api.
+x-api: &api
+  <<: [*logging, *hardening]
+  image: ghcr.io/ahmadfarras/prototipe-ar-web/api:${IMAGE_TAG:-latest}
+  mem_limit: 384m
+  cpus: 1
+  env_file: .env
+
 services:
   db:
+    <<: *logging
     image: postgres:18-alpine
-    environment:
-      POSTGRES_USER: ar
-      POSTGRES_PASSWORD: ar
-      POSTGRES_DB: ar_dev
+    restart: unless-stopped
+    # Not read-only and with its capabilities: the entrypoint starts as root
+    # to own the data directory, then drops to the postgres user.
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 512m
+    env_file: .env
     ports:
       - '127.0.0.1:54329:5432'
     volumes:
       - db-data:/var/lib/postgresql
-      - ./server/db-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       # -h forces TCP: the init-time server only listens on the socket.
-      test: ['CMD-SHELL', 'pg_isready -h 127.0.0.1 -U ar -d ar_dev']
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -h 127.0.0.1 -U $POSTGRES_USER -d $POSTGRES_DB',
+        ]
       interval: 2s
       timeout: 3s
       retries: 30
+
+  migrate:
+    <<: *api
+    command: ['node', 'server/scripts/migrate.ts', 'up']
+    restart: 'no'
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    <<: *api
+    restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  # Plain HTTP on the loopback interface: the host's nginx terminates HTTPS
+  # and proxies to it.
+  web:
+    <<: [*logging, *hardening]
+    image: ghcr.io/ahmadfarras/prototipe-ar-web/web:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    mem_limit: 128m
+    cpus: 1
+    ports:
+      - '127.0.0.1:${WEB_PORT:-8090}:8080'
+    depends_on:
+      api:
+        condition: service_healthy
 
 volumes:
   db-data:

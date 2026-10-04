@@ -1,5 +1,8 @@
+import { isIP } from 'node:net'
+
 export type Config = {
   databaseUrl: string
+  host: string
   port: number
   cookieSecure: boolean
   trustProxy: boolean
@@ -7,12 +10,14 @@ export type Config = {
 
 type Env = Record<string, string | undefined>
 
+const DEFAULT_HOST = '127.0.0.1'
 const DEFAULT_PORT = 3000
 const MAX_PORT = 65535
 
 export function loadConfig(env: Env): Config {
   return {
     databaseUrl: readDatabaseUrl(env.DATABASE_URL),
+    host: readHost(env.HOST),
     port: readPort(env.PORT),
     cookieSecure: readBoolean('COOKIE_SECURE', env.COOKIE_SECURE, true),
     trustProxy: readBoolean('TRUST_PROXY', env.TRUST_PROXY, false),
@@ -26,6 +31,12 @@ function readDatabaseUrl(value: string | undefined): string {
     throw new Error('DATABASE_URL must be a postgres:// URL')
   }
   return value!
+}
+
+function readHost(value: string | undefined): string {
+  if (value === undefined) return DEFAULT_HOST
+  if (isIP(value) === 0) throw new Error('HOST must be an IP address')
+  return value
 }
 
 function readPort(value: string | undefined): number {

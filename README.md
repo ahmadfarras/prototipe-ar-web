@@ -54,8 +54,9 @@ Needs Node 26 and Docker.
 
 ```bash
 npm install
-cp .env.example .env
-docker compose up -d   # PostgreSQL on 127.0.0.1:54329
+cp .env.example .env    # then switch it to the local values listed at the bottom of the file
+docker compose up -d db   # PostgreSQL on 127.0.0.1:54329
+docker compose exec -T db psql -U ar -d ar < server/db-init/create-databases.sql   # once: databases for the tests
 make migrate           # apply the schema
 make seed              # two sample products with coupons
 npm run api:dev        # API on http://127.0.0.1:3000   (terminal 1)
@@ -73,7 +74,7 @@ one origin. To try the scanner on a desktop, show
 | `npm run dev`                        | Web dev server on `http://localhost:5173`                            |
 | `npm run dev:https`                  | Web dev server over HTTPS on your LAN, for testing on a phone        |
 | `npm run api:dev` / `api:start`      | API with / without file watching                                     |
-| `docker compose up -d` / `down`      | Start / stop the PostgreSQL container                                |
+| `docker compose up -d db`            | Start only the PostgreSQL container                                  |
 | `make migrate` / `make migrate-down` | Apply the schema / roll back the latest migration                    |
 | `make seed`                          | Insert or update the products in `server/seed/seed.json`             |
 | `npm run targets:build`              | Compile the registered product images into `public/targets/`         |
@@ -210,20 +211,112 @@ with Safari, for **View product in AR**.
 
 ## Deploy
 
-Two parts, served from **one origin** over HTTPS:
+Pushing to `main` deploys. `.github/workflows/deploy.yml` does three things:
 
-- Static files: `npm run build` writes them to `dist/`. `public/_headers`
-  (security headers, including the ones that forbid framing the site) is only
-  applied by hosts that understand that file; on your own server, set the
-  same headers in the web server configuration. The host must serve
-  `index.html` for unknown paths so that deep links work (automatic on
-  Cloudflare Pages, which also applies `public/_headers`; on Netlify add
-  `public/_redirects` containing `/* /index.html 200`).
-- The API: a Node 26 process (`node server/src/main.ts`) with PostgreSQL,
-  reachable at `/api` on the same host through a reverse proxy. Set
-  `DATABASE_URL`, `COOKIE_SECURE=true` and, behind the proxy,
-  `TRUST_PROXY=true` so rate limiting sees the real client address. The API
-  listens on `127.0.0.1`.
+1. **verify** — `npm run verify` (typecheck, lint, format, unit tests, build).
+2. **build-and-push** — builds the two images and pushes them to GitHub
+   Container Registry: `ghcr.io/<owner>/<repo>/api` and `…/web`.
+3. **deploy-to-vps** — over SSH on the server: `docker-compose pull`,
+   `docker-compose up -d` (migrations run first), then the seed.
+
+```
+visitor ──HTTPS──► nginx on the server ──► web container :8090 ──► api ──► db
+```
+
+The web container (nginx) serves the built site and forwards `/api` to the
+API, on plain HTTP on `127.0.0.1:8090`. The nginx that already runs on the
+server terminates HTTPS and proxies the domain to that port.
+
+### One-time setup
+
+In the GitHub repository, add four secrets:
+
+| Secret            | Value                                                                       |
+| ----------------- | --------------------------------------------------------------------------- |
+| `VPS_IP`          | Address of the server                                                       |
+| `VPS_USER`        | SSH user that may run Docker                                                |
+| `VPS_SSH_KEY`     | Private key of that user                                                    |
+| `VPS_FINGERPRINT` | Fingerprint of the server's host key (the deploy refuses to run without it) |
+
+Get the fingerprint on the server itself, so it cannot be spoofed:
+
+```bash
+ssh-keygen -l -f /etc/ssh/ssh_host_ed25519_key.pub | cut -d ' ' -f2
+```
+
+On the server:
+
+1. Create the folder the workflow deploys into and put two files there:
+
+   ```bash
+   mkdir -p ~/ar-product && cd ~/ar-product
+   # copy docker-compose.yml and .env.example from this repository here, then:
+   cp .env.example .env && chmod 600 .env
+   nano .env               # set POSTGRES_PASSWORD
+   ```
+
+   `docker-compose.yml` passes `.env` to the containers (`env_file`), so
+   that file is the one place for settings. Only `POSTGRES_PASSWORD` has to
+   be filled in; `DATABASE_URL` picks it up. Use letters and digits only (it
+   ends up inside a URL), for example the output of `openssl rand -hex 24`.
+   It is applied when the database volume is first created; changing it
+   later in `.env` alone does not change the database's password. Change
+   `WEB_PORT` only if 8090 is taken.
+
+2. Add the site to the server's nginx. Its configuration lives on the server,
+   not in this repository; it only has to proxy the domain to the web
+   container and pass the visitor's address:
+
+   ```nginx
+   location / {
+       proxy_pass http://127.0.0.1:8090;
+       proxy_set_header Host $host;
+       proxy_set_header X-Real-IP $remote_addr;
+   }
+   ```
+
+   Reload nginx, then get the certificate with
+   `sudo certbot --nginx -d <domain>`. HTTPS is required: browsers refuse
+   camera access without it.
+
+3. Push to `main`.
+
+If `docker-compose.yml` changes in the repository, copy it to the server
+again; the workflow does not do that.
+
+### On the server afterwards
+
+```bash
+cd ~/ar-product
+docker-compose ps
+docker-compose logs -f api
+docker-compose exec db psql -U ar -d ar
+docker-compose exec db pg_dump -U ar ar > backup.sql
+IMAGE_TAG=sha-<7 characters of a commit> docker-compose up -d   # roll back to that build
+```
+
+Notes:
+
+- Nothing is reachable from outside except through the server's nginx: the
+  web container and the database publish on `127.0.0.1` only, the API not at
+  all.
+- Keep `proxy_set_header X-Real-IP $remote_addr;` in the server's nginx
+  exactly as in the example. Rate limiting counts per visitor address and
+  trusts that header.
+- `down` keeps the data; `down -v` deletes the database.
+- The API and web containers run read-only, without Linux capabilities, with
+  memory, CPU and process limits, and with capped log files. Raise
+  `mem_limit` in `docker-compose.yml` if a container is killed for memory.
+- The workflow pins every action to a commit. To update one, replace the
+  commit hash and the version in the comment next to it.
+- After registering a new product, run `npm run targets:build` locally and
+  commit `public/targets/` together with the seed file; the push deploys and
+  seeds it.
+- The images: `deploy/api.Dockerfile` (Node 26 on Alpine, production
+  dependencies only, non-root) and `deploy/web.Dockerfile` (builds the site,
+  then ships only `dist/` in an unprivileged nginx image; its configuration is
+  `deploy/nginx.conf`). To build them by hand:
+  `docker build -f deploy/api.Dockerfile -t ghcr.io/<owner>/<repo>/api:latest .`
 
 ## Known limits
 
