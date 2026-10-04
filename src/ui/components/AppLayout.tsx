@@ -3,6 +3,9 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router'
 import { VIEW_IN_AR_PATH } from '../../domain/productLink'
 import { SCAN_PRODUCT_PATH } from '../paths'
 
+const AUTHOR_URL =
+  'https://ahmadfarrassyafrin.com/?utm_source=prototype-ar-web&utm_medium=trademark'
+
 const TAB_CLASS =
   '-mb-px flex min-h-11 items-center border-b-2 border-transparent px-1 text-sm font-medium text-slate-600 aria-[current=page]:border-slate-900 aria-[current=page]:text-slate-900'
 
@@ -39,6 +42,17 @@ export function AppLayout() {
       >
         <Outlet />
       </main>
+      <footer className="pb-4 text-center text-xs text-slate-500">
+        © 2026{' '}
+        <a
+          href={AUTHOR_URL}
+          target="_blank"
+          rel="noopener"
+          className="inline-flex min-h-11 items-center font-medium text-slate-700 underline"
+        >
+          Ahmad Farras Syafrin
+        </a>
+      </footer>
     </div>
   )
 }
