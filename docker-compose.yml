@@ -1,6 +1,6 @@
 # Settings come from .env (copy .env.example). The images are built and pushed by .github/workflows/deploy.yml, which
 # deploys the tag of its own commit. Run by hand, the latest image is used;
-# to roll back:  IMAGE_TAG=sha-<commit> docker-compose up -d
+# to roll back:  IMAGE_TAG=sha-<commit> docker compose up -d
 
 x-logging: &logging
   logging:

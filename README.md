@@ -216,8 +216,8 @@ Pushing to `main` deploys. `.github/workflows/deploy.yml` does three things:
 1. **verify** — `npm run verify` (typecheck, lint, format, unit tests, build).
 2. **build-and-push** — builds the two images and pushes them to GitHub
    Container Registry: `ghcr.io/<owner>/<repo>/api` and `…/web`.
-3. **deploy-to-vps** — over SSH on the server: `docker-compose pull`,
-   `docker-compose up -d` (migrations run first), then the seed.
+3. **deploy-to-vps** — over SSH on the server: `docker compose pull`,
+   `docker compose up -d` (migrations run first), then the seed.
 
 ```
 visitor ──HTTPS──► nginx on the server ──► web container :8090 ──► api ──► db
@@ -241,15 +241,20 @@ In the GitHub repository, add four secrets:
 Get the fingerprint on the server itself, so it cannot be spoofed:
 
 ```bash
-ssh-keygen -l -f /etc/ssh/ssh_host_ed25519_key.pub | cut -d ' ' -f2
+ssh-keygen -l -f /etc/ssh/ssh_host_ecdsa_key.pub | cut -d ' ' -f2
 ```
+
+Use the ECDSA key: that is the host key type the deploy action asks the
+server for when the server has one. If the deploy fails with "host key
+fingerprint mismatch", the server offered another type; take the fingerprint
+of `ssh_host_ed25519_key.pub` or `ssh_host_rsa_key.pub` instead.
 
 On the server:
 
 1. Create the folder the workflow deploys into and put two files there:
 
    ```bash
-   mkdir -p ~/ar-product && cd ~/ar-product
+   mkdir -p ~/prototipe-ar-web && cd ~/prototipe-ar-web
    # copy docker-compose.yml and .env.example from this repository here, then:
    cp .env.example .env && chmod 600 .env
    nano .env               # set POSTGRES_PASSWORD
@@ -287,12 +292,12 @@ again; the workflow does not do that.
 ### On the server afterwards
 
 ```bash
-cd ~/ar-product
-docker-compose ps
-docker-compose logs -f api
-docker-compose exec db psql -U ar -d ar
-docker-compose exec db pg_dump -U ar ar > backup.sql
-IMAGE_TAG=sha-<7 characters of a commit> docker-compose up -d   # roll back to that build
+cd ~/prototipe-ar-web
+docker compose ps
+docker compose logs -f api
+docker compose exec db psql -U ar -d ar
+docker compose exec db pg_dump -U ar ar > backup.sql
+IMAGE_TAG=sha-<7 characters of a commit> docker compose up -d   # roll back to that build
 ```
 
 Notes:
