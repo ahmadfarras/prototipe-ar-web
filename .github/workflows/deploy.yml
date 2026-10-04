@@ -123,11 +123,11 @@ jobs:
             # docker-compose.yml and .env are placed here once, by hand.
             cd ~/prototipe-ar-web
 
-            docker-compose pull
+            docker compose pull
             # Runs the migrations, then starts or replaces the API and web containers.
-            docker-compose up -d
+            docker compose up -d
             # Safe to repeat: updates products from the seed file, never touches claims.
-            docker-compose run --rm -T api node server/scripts/seed.ts
+            docker compose run --rm -T api node server/scripts/seed.ts
 
-            docker-compose ps
+            docker compose ps
             docker image prune -f
