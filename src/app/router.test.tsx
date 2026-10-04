@@ -180,6 +180,25 @@ describe('routes', () => {
     expect(document.querySelector('model-viewer')).not.toBeInTheDocument()
   })
 
+  it.each(['/scan', '/view-in-ar', '/nope'])(
+    'credits the author with a tagged link on %s',
+    async (path) => {
+      renderAt(path)
+
+      const footer = await screen.findByRole('contentinfo')
+      const link = within(footer).getByRole('link', {
+        name: 'Ahmad Farras Syafrin',
+      })
+      expect(footer).toHaveTextContent('© 2026 Ahmad Farras Syafrin')
+      expect(link).toHaveAttribute(
+        'href',
+        'https://ahmadfarrassyafrin.com/?utm_source=prototype-ar-web&utm_medium=trademark',
+      )
+      expect(link).toHaveAttribute('target', '_blank')
+      expect(link).toHaveAttribute('rel', 'noopener')
+    },
+  )
+
   it('moves focus to the main content after navigation', async () => {
     renderAt('/view-in-ar')
 
