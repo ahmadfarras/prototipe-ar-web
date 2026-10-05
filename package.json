@@ -21,6 +21,7 @@
     "verify:all": "npm run verify && npm run test:db && npm run test:e2e",
     "api:dev": "node --watch --env-file=.env server/src/main.ts",
     "api:start": "node --env-file=.env server/src/main.ts",
+    "usdz:build": "node scripts/build-usdz.mjs",
     "targets:build": "node --env-file=.env scripts/build-targets.mjs"
   },
   "dependencies": {

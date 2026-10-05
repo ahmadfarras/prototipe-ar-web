@@ -48,6 +48,7 @@ test('a product deep link loads its 3D model', async ({ page }) => {
 
   const viewer = page.locator('model-viewer')
   await expect(viewer).toHaveJSProperty('src', '/models/water-bottle.glb')
+  await expect(viewer).toHaveJSProperty('iosSrc', '/models/water-bottle.usdz')
   await expect(viewer).toHaveJSProperty('ar', true)
   await expect(viewer).toHaveJSProperty('cameraControls', true)
   await expect(viewer).toHaveJSProperty('arScale', 'fixed')
@@ -55,6 +56,30 @@ test('a product deep link loads its 3D model', async ({ page }) => {
   await expect(page.getByText('Loading 3D model')).toBeHidden()
   await expect(page.getByRole('button', { name: 'View in AR' })).toBeVisible()
   expect(errors).toEqual([])
+})
+
+test.describe('in Chrome on an iPhone', () => {
+  test.use({
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/138.0.7204.156 Mobile/15E148 Safari/604.1',
+  })
+
+  test('AR is available', async ({ page }) => {
+    await page.goto('/view-in-ar/p/water-bottle')
+
+    const viewer = page.locator('model-viewer')
+    await expect(viewer).toHaveJSProperty('loaded', true)
+    await expect(viewer).toHaveJSProperty('canActivateAR', true)
+    await expect(page.getByText(/AR is not available/)).toBeHidden()
+    await expect(page.getByRole('button', { name: 'View in AR' })).toBeVisible()
+  })
+})
+
+test('the iOS model is served as USDZ', async ({ request }) => {
+  const response = await request.get('/models/water-bottle.usdz')
+
+  expect(response.status()).toBe(200)
+  expect(response.headers()['content-type']).toBe('model/vnd.usdz+zip')
 })
 
 for (const path of [

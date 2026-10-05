@@ -4,6 +4,7 @@
     "name": "Sheen Chair",
     "description": "Velvet lounge chair with a wooden frame. Place it in your room to check the fit.",
     "modelUrl": "/models/sheen-chair.glb",
+    "iosModelUrl": "/models/sheen-chair.usdz",
     "alt": "3D model of a velvet lounge chair with wooden legs",
     "placement": "floor"
   },
@@ -12,6 +13,7 @@
     "name": "Water Bottle",
     "description": "Insulated steel bottle. Place it on a table to see it at real size.",
     "modelUrl": "/models/water-bottle.glb",
+    "iosModelUrl": "/models/water-bottle.usdz",
     "alt": "3D model of a steel water bottle",
     "placement": "floor"
   }
