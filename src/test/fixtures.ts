@@ -44,5 +44,8 @@ export const bookCoupon: ClaimedCoupon = {
 
 export const manifest: TargetManifest = {
   mindUrl: '/targets/targets-07a7ebdd.mind',
-  slugs: ['book', 'box'],
+  targets: [
+    { slug: 'book', name: 'Sample Book', imageUrl: '/targets/images/book.jpg' },
+    { slug: 'box', name: 'Sample Box', imageUrl: '/targets/images/box.jpg' },
+  ],
 }

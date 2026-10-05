@@ -80,15 +80,57 @@ beforeEach(() => {
 })
 
 describe('ScanProductPage', () => {
-  it('waits for a tap before using the camera', () => {
-    const experiences = setup()
+  it('waits for a tap before using the camera', async () => {
+    setup()
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'Scan product' }),
     ).toBeVisible()
     expect(screen.getByRole('button', { name: 'Start camera' })).toBeVisible()
+    await screen.findByRole('region', { name: 'Images you can scan' })
     expect(screen.queryByTestId('tracker')).not.toBeInTheDocument()
-    expect(experiences.loadManifest).not.toHaveBeenCalled()
+  })
+
+  it('shows the images of the registered products before the camera starts', async () => {
+    setup()
+
+    const section = within(
+      await screen.findByRole('region', { name: 'Images you can scan' }),
+    )
+    expect(
+      section.getByRole('img', { name: 'Scan target: Sample Book' }),
+    ).toHaveAttribute('src', '/targets/images/book.jpg')
+    expect(
+      section.getByRole('img', { name: 'Scan target: Sample Box' }),
+    ).toHaveAttribute('src', '/targets/images/box.jpg')
+  })
+
+  it('keeps the images in view while searching', async () => {
+    await startSearching()
+
+    expect(
+      screen.getByRole('region', { name: 'Images you can scan' }),
+    ).toBeVisible()
+  })
+
+  it('works without the images when they cannot be loaded up front', async () => {
+    const loadManifest = vi
+      .fn<ProductExperiences['loadManifest']>()
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValue(manifest)
+    setup({ loadManifest })
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('region', { name: 'Images you can scan' }),
+    ).not.toBeInTheDocument()
+
+    await startCamera()
+
+    expect(tracker.props).toMatchObject({ targetCount: 2 })
+    expect(
+      screen.getByRole('region', { name: 'Images you can scan' }),
+    ).toBeVisible()
   })
 
   it('starts the tracker with the registered targets', async () => {
@@ -128,7 +170,14 @@ describe('ScanProductPage', () => {
     const experiences = await startSearching({
       loadManifest: async () => ({
         ...manifest,
-        slugs: ['book', 'box', 'book'],
+        targets: [
+          ...manifest.targets,
+          {
+            slug: 'book',
+            name: 'Sample Book',
+            imageUrl: '/targets/images/book-back.jpg',
+          },
+        ],
       }),
     })
 
@@ -236,6 +285,9 @@ describe('ScanProductPage', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent(message)
     expect(screen.queryByTestId('tracker')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('region', { name: 'Images you can scan' }),
+    ).not.toBeInTheDocument()
     await userEvent.click(
       screen.getByRole('link', { name: 'Browse products in AR instead' }),
     )
@@ -253,6 +305,9 @@ describe('ScanProductPage', () => {
       'Could not load the registered products.',
     )
     expect(screen.queryByTestId('tracker')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('region', { name: 'Images you can scan' }),
+    ).not.toBeInTheDocument()
   })
 
   describe('hint', () => {

@@ -64,8 +64,9 @@ npm run dev            # web on http://localhost:5173   (terminal 2)
 ```
 
 The dev server proxies `/api` to the API, so the browser only ever talks to
-one origin. To try the scanner on a desktop, show
-`targets/images/wizard-of-oz.jpg` to the webcam on a phone or a second screen.
+one origin. The Scan product page shows the image of every registered product
+under **Images you can scan**. To try the scanner on a desktop, open one of
+them on a phone or a second screen and show it to the webcam.
 
 ## Scripts
 
@@ -100,8 +101,7 @@ server/src        The API, in the same four layers
 server/migrations SQL schema
 server/seed       Seed data
 server/test       Tests that need PostgreSQL or a listening server
-targets/images    Source images of the registered products
-public/targets    Compiled targets and their manifest (generated, committed)
+public/targets    Images of the registered products, plus the compiled targets and manifest generated from them
 scripts           QR code generation, target compilation
 e2e               Playwright tests
 ```
@@ -112,13 +112,16 @@ Dependencies point inward on both sides: `ui`/`adapter` → `usecase` →
 ## Register a product for scanning
 
 1. Take a straight, sharp, evenly lit picture of the flat face of the product
-   and save it as `targets/images/<slug>.jpg`. Use artwork with a lot of
+   and save it as `public/targets/images/<slug>.jpg`. Use artwork with a lot of
    detail; large plain areas and repeating patterns track badly. Shortest
-   side at least 512 px, at most 1 MB. Credit it in `targets/CREDITS.md`.
+   side at least 512 px, at most 1 MB. Credit it in `public/targets/CREDITS.md`.
 2. Add the product to `server/seed/seed.json` with the next free target
    `index` (indexes are `0, 1, 2, …` without gaps; at most 20 targets) and,
    optionally, a `coupon`.
-3. Run `make seed`, then `npm run targets:build`.
+3. Run `make seed`, then `npm run targets:build`. The Scan product page
+   shows these images to visitors, so only register an image you may publish.
+   File names are lower-case words joined by hyphens, ending in `.jpg`,
+   `.jpeg` or `.png`.
 4. Run `npm run test` — a test checks that the published targets match the
    seed file.
 

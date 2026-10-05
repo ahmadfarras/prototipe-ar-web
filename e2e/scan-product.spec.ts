@@ -38,6 +38,33 @@ async function claimsOf(slug: string) {
   return rows
 }
 
+test('the page shows the images of the registered products', async ({
+  page,
+}) => {
+  const errors = collectErrors(page)
+
+  await page.goto('/scan')
+
+  const section = page.getByRole('region', { name: 'Images you can scan' })
+  for (const [name, file] of [
+    ['The Wonderful Wizard of Oz', 'wizard-of-oz.jpg'],
+    ['The Tale of Peter Rabbit', 'peter-rabbit.jpg'],
+  ]) {
+    const image = section.getByRole('img', {
+      name: `Scan target: ${name}`,
+    })
+    await expect(image).toHaveJSProperty('complete', true)
+    expect(
+      await image.evaluate((element: HTMLImageElement) => element.naturalWidth),
+    ).toBeGreaterThan(0)
+    await expect(section.getByRole('link', { name })).toHaveAttribute(
+      'href',
+      `/targets/images/${file}`,
+    )
+  }
+  expect(errors).toEqual([])
+})
+
 test('a registered product shows its anchored card and explanation', async ({
   page,
   baseURL,
@@ -50,7 +77,7 @@ test('a registered product shows its anchored card and explanation', async ({
       foreignRequests.push(url)
     }
   })
-  await pointCameraAt(page, 'targets/images/peter-rabbit.jpg')
+  await pointCameraAt(page, 'public/targets/images/peter-rabbit.jpg')
 
   await startScanning(page)
 
@@ -75,7 +102,7 @@ test('a registered product shows its anchored card and explanation', async ({
 test('claiming a coupon stores one claim and repeats the same code', async ({
   page,
 }) => {
-  await pointCameraAt(page, 'targets/images/wizard-of-oz.jpg')
+  await pointCameraAt(page, 'public/targets/images/wizard-of-oz.jpg')
 
   async function claimThroughTheCard() {
     await startScanning(page)
@@ -121,7 +148,7 @@ test('a sold-out coupon is explained and nothing is stored', async ({
      ON CONFLICT DO NOTHING`,
     [OTHER_VISITOR],
   )
-  await pointCameraAt(page, 'targets/images/peter-rabbit.jpg')
+  await pointCameraAt(page, 'public/targets/images/peter-rabbit.jpg')
 
   await startScanning(page)
   await page
@@ -170,7 +197,7 @@ test('a blocked camera is explained with a way out', async ({ page }) => {
 })
 
 test('leaving the scanner releases the camera', async ({ page }) => {
-  await pointCameraAt(page, 'targets/images/peter-rabbit.jpg')
+  await pointCameraAt(page, 'public/targets/images/peter-rabbit.jpg')
   await startScanning(page)
   await expect(page.getByRole('region', { name: 'Product' })).toBeVisible({
     timeout: DETECTION_TIMEOUT,

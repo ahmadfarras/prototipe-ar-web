@@ -1,5 +1,5 @@
 import { chromium } from '@playwright/test'
-import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
+import { readdir, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import pg from 'pg'
@@ -10,9 +10,10 @@ import {
 } from './targetManifest.mjs'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const IMAGE_DIR = path.join(ROOT, 'targets/images')
 const LIBRARY_DIR = path.join(ROOT, 'src/vendor/mind-ar')
 const OUTPUT_DIR = path.join(ROOT, 'public/targets')
+// The only copy of the images: compiled from here and shown on the Scan product page.
+const IMAGE_DIR = path.join(OUTPUT_DIR, 'images')
 const MANIFEST_FILE = 'targets.manifest.json'
 // Never contacted: every request to it is answered from disk.
 const ORIGIN = 'http://targets.local'
@@ -21,7 +22,7 @@ async function readRegisteredTargets(databaseUrl) {
   const pool = new pg.Pool({ connectionString: databaseUrl })
   try {
     const { rows } = await pool.query(
-      `SELECT t.target_index AS "targetIndex", p.slug, t.image_file AS "imageFile"
+      `SELECT t.target_index AS "targetIndex", p.slug, p.name, t.image_file AS "imageFile"
        FROM ar_targets t JOIN products p ON p.id = t.product_id
        ORDER BY t.target_index`,
     )
@@ -87,11 +88,11 @@ const targets = await readRegisteredTargets(databaseUrl)
 validateTargets(targets, new Set(await readdir(IMAGE_DIR)))
 
 console.log(`Compiling ${targets.length} targets…`)
-const mindData = await compileTargets(targets.map((target) => target.imageFile))
+const imageFiles = targets.map((target) => target.imageFile)
+const mindData = await compileTargets(imageFiles)
 const fileName = mindFileName(mindData)
 const manifest = buildManifest(targets, fileName)
 
-await mkdir(OUTPUT_DIR, { recursive: true })
 await writeFile(path.join(OUTPUT_DIR, fileName), mindData)
 await writeFile(
   path.join(OUTPUT_DIR, MANIFEST_FILE),
@@ -104,6 +105,6 @@ for (const file of await readdir(OUTPUT_DIR)) {
 }
 
 console.log(`public/targets/${fileName} (${mindData.length} bytes)`)
-for (const [index, { slug }] of manifest.targets.entries()) {
-  console.log(`  ${index} -> ${slug}`)
+for (const [index, { slug, imageUrl }] of manifest.targets.entries()) {
+  console.log(`  ${index} -> ${slug} (public${imageUrl})`)
 }

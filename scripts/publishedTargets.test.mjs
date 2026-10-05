@@ -23,7 +23,20 @@ describe('published target files', () => {
       .sort((a, b) => a.index - b.index)
       .map(({ slug }) => slug)
 
-    expect(manifest.slugs).toEqual(seeded)
+    expect(manifest.targets.map(({ slug }) => slug)).toEqual(seeded)
+  })
+
+  it('names every target after its seeded product', () => {
+    const names = new Map(
+      readJson('server/seed/seed.json').products.map(({ slug, name }) => [
+        slug,
+        name,
+      ]),
+    )
+
+    for (const { slug, name } of manifest.targets) {
+      expect(name).toBe(names.get(slug))
+    }
   })
 
   it('has an image for every seeded target', () => {
@@ -32,7 +45,7 @@ describe('published target files', () => {
     )
 
     for (const image of images) {
-      expect(existsSync(`targets/images/${image}`)).toBe(true)
+      expect(existsSync(`public/targets/images/${image}`)).toBe(true)
     }
   })
 })
