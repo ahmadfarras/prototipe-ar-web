@@ -8,7 +8,6 @@ playwright-report
 qr
 docs
 e2e
-targets
 .env*
 *.log
 *.md

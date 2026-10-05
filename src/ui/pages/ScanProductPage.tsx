@@ -9,6 +9,7 @@ import {
   type DialogView,
 } from '../components/ExperienceDialog'
 import { ProductCard, type ExperienceResult } from '../components/ProductCard'
+import { RegisteredTargets } from '../components/RegisteredTargets'
 import { TargetTracker, type TrackerError } from '../components/TargetTracker'
 
 type Props = {
@@ -48,6 +49,20 @@ export function ScanProductPage({ experiences }: Props) {
   const [isHintDue, setIsHintDue] = useState(false)
 
   useEffect(() => {
+    let isCurrent = true
+    // A failure here only hides the images; Start camera loads again and reports it.
+    experiences.loadManifest().then(
+      (loaded) => {
+        if (isCurrent) setManifest(loaded)
+      },
+      () => {},
+    )
+    return () => {
+      isCurrent = false
+    }
+  }, [experiences])
+
+  useEffect(() => {
     if (phase !== 'searching') return
     const timer = setTimeout(() => setIsHintDue(true), HINT_DELAY_MS)
     return () => clearTimeout(timer)
@@ -78,7 +93,7 @@ export function ScanProductPage({ experiences }: Props) {
   }
 
   function handleFound(targetIndex: number) {
-    const slug = manifest?.slugs[targetIndex]
+    const slug = manifest?.targets[targetIndex]?.slug
     if (slug) lock(slug)
   }
 
@@ -124,7 +139,7 @@ export function ScanProductPage({ experiences }: Props) {
           {manifest && (
             <TargetTracker
               mindUrl={manifest.mindUrl}
-              targetCount={manifest.slugs.length}
+              targetCount={manifest.targets.length}
               onReady={() => setPhase('searching')}
               onFound={handleFound}
               onLost={handleLost}
@@ -152,6 +167,7 @@ export function ScanProductPage({ experiences }: Props) {
           )}
         </>
       )}
+      {manifest && !problem && <RegisteredTargets targets={manifest.targets} />}
       {dialog && (
         <ExperienceDialog
           experience={dialog.experience}

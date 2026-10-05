@@ -9,6 +9,7 @@ import {
 const row = (targetIndex, slug = 'book') => ({
   targetIndex,
   slug,
+  name: `Sample ${slug}`,
   imageFile: `${targetIndex}.jpg`,
 })
 const rows = (count) => Array.from({ length: count }, (_, index) => row(index))
@@ -48,9 +49,27 @@ describe('validateTargets', () => {
     )
   })
 
+  it.each(['../secret.jpg', 'Cover.jpg', 'my cover.jpg', 'cover.gif', 'cover'])(
+    'rejects the image file name %j',
+    (imageFile) => {
+      expect(() =>
+        validateTargets([{ ...row(0), imageFile }], new Set([imageFile])),
+      ).toThrow(`ending in .jpg, .jpeg or .png: ${imageFile}`)
+    },
+  )
+
+  it.each(['cover.jpg', 'front-cover-2.jpeg', 'box.png'])(
+    'accepts the image file name %j',
+    (imageFile) => {
+      expect(() =>
+        validateTargets([{ ...row(0), imageFile }], new Set([imageFile])),
+      ).not.toThrow()
+    },
+  )
+
   it('rejects a target whose image is missing', () => {
     expect(() => validateTargets(rows(2), images(1))).toThrow(
-      'Image not found in targets/images: 1.jpg',
+      'Image not found in public/targets/images: 1.jpg',
     )
   })
 })
@@ -66,7 +85,7 @@ describe('mindFileName', () => {
 })
 
 describe('buildManifest', () => {
-  it('lists the slugs in target order', () => {
+  it('lists each target with its product name and image in target order', () => {
     expect(
       buildManifest(
         [row(0, 'book'), row(1, 'box'), row(2, 'book')],
@@ -74,7 +93,19 @@ describe('buildManifest', () => {
       ),
     ).toEqual({
       mindUrl: '/targets/targets-ba7816bf.mind',
-      targets: [{ slug: 'book' }, { slug: 'box' }, { slug: 'book' }],
+      targets: [
+        {
+          slug: 'book',
+          name: 'Sample book',
+          imageUrl: '/targets/images/0.jpg',
+        },
+        { slug: 'box', name: 'Sample box', imageUrl: '/targets/images/1.jpg' },
+        {
+          slug: 'book',
+          name: 'Sample book',
+          imageUrl: '/targets/images/2.jpg',
+        },
+      ],
     })
   })
 })

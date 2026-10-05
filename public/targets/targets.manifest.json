@@ -2,10 +2,14 @@
   "mindUrl": "/targets/targets-07a7ebdd.mind",
   "targets": [
     {
-      "slug": "wizard-of-oz"
+      "slug": "wizard-of-oz",
+      "name": "The Wonderful Wizard of Oz",
+      "imageUrl": "/targets/images/wizard-of-oz.jpg"
     },
     {
-      "slug": "peter-rabbit"
+      "slug": "peter-rabbit",
+      "name": "The Tale of Peter Rabbit",
+      "imageUrl": "/targets/images/peter-rabbit.jpg"
     }
   ]
 }
