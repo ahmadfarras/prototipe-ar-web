@@ -13,3 +13,6 @@
 
 /targets/targets.manifest.json
   Cache-Control: no-cache
+
+/models/*.usdz
+  Content-Type: model/vnd.usdz+zip

@@ -28,6 +28,10 @@ describe('product catalog', () => {
       expect(product.alt).not.toBe('')
       expect(['floor', 'wall']).toContain(product.placement)
       expect(product.modelUrl).toMatch(/\.glb$/)
+      // Without it, AR is unavailable in Chrome, Edge and Firefox on iOS.
+      expect(product.iosModelUrl).toBe(
+        product.modelUrl.replace(/\.glb$/, '.usdz'),
+      )
 
       const urls = [product.modelUrl, product.iosModelUrl, product.posterUrl]
       for (const url of urls.filter((url) => url !== undefined)) {

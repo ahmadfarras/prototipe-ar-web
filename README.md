@@ -164,16 +164,21 @@ requests.
      "name": "My Product",
      "description": "Shown on the product page.",
      "modelUrl": "/models/my-product.glb",
+     "iosModelUrl": "/models/my-product.usdz",
      "alt": "3D model of my product",
      "placement": "floor"
    }
    ```
 
    `slug` is lowercase letters, digits and single hyphens. `placement` is
-   `floor` or `wall`. Optional: `iosModelUrl` (a `.usdz`) and `posterUrl`.
+   `floor` or `wall`. Optional: `posterUrl`.
 
-3. Run `npm run test` — a catalog test checks slugs and file paths.
-4. Run `npm run qr -- https://your-host` and print `qr/<slug>.svg`.
+3. Run `npm run usdz:build`. It writes `public/models/<name>.usdz` for every
+   product, converted from the GLB in headless Chromium. iPhones use that file
+   for AR; without it AR only works in Safari, not in Chrome, Edge or Firefox
+   on iOS.
+4. Run `npm run test` — a catalog test checks slugs and file paths.
+5. Run `npm run qr -- https://your-host` and print `qr/<slug>.svg`.
 
 ### Model budget
 
@@ -342,8 +347,10 @@ Notes:
   needs a consent notice.
 - MindAR's last release is from January 2024. It is vendored and patched in
   three places (`src/vendor/mind-ar/README.md`).
-- iPhones have no WebXR AR; View product in AR uses AR Quick Look with a USDZ
-  generated from the GLB. If a model looks wrong there, export a real `.usdz`
-  and set `iosModelUrl`.
+- iPhones have no WebXR AR; View product in AR uses AR Quick Look with the
+  USDZ that `npm run usdz:build` converts from the GLB. The conversion does not
+  support every material; if a model looks wrong, replace its `.usdz` with one
+  exported from a 3D tool. The Google app and in-app browsers (Instagram and
+  the like) on iOS still cannot open AR.
 - `@google/model-viewer` 4.3 prints a few debug lines to the console.
 - No Content-Security-Policy header yet.

@@ -1,7 +1,23 @@
 import tailwindcss from '@tailwindcss/vite'
 import basicSsl from '@vitejs/plugin-basic-ssl'
 import react from '@vitejs/plugin-react'
+import type { Connect, Plugin } from 'vite'
 import { defineConfig } from 'vitest/config'
+
+// Vite's static server does not know .usdz; AR Quick Look expects this type.
+// deploy/nginx.conf does the same in production.
+const setUsdzType: Connect.NextHandleFunction = (request, response, next) => {
+  if (request.url?.split('?')[0].endsWith('.usdz')) {
+    response.setHeader('Content-Type', 'model/vnd.usdz+zip')
+  }
+  next()
+}
+
+const usdzContentType: Plugin = {
+  name: 'usdz-content-type',
+  configureServer: (server) => void server.middlewares.use(setUsdzType),
+  configurePreviewServer: (server) => void server.middlewares.use(setUsdzType),
+}
 
 export default defineConfig(({ mode }) => {
   const isHttps = mode === 'https'
@@ -10,7 +26,12 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    plugins: [react(), tailwindcss(), ...(isHttps ? [basicSsl()] : [])],
+    plugins: [
+      react(),
+      tailwindcss(),
+      usdzContentType,
+      ...(isHttps ? [basicSsl()] : []),
+    ],
     server: { host: isHttps, proxy },
     preview: { proxy },
     build: {
